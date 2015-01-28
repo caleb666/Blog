@@ -2,7 +2,7 @@
 <strong>A delegate is a pointer to a method (c# language element that allows referencing a method).</strong>
 Delegates are used in event driven development instead of direct method calls, becuase during development we don't know which method should be used.
 All we know during development - is which parameters to pass to this unknown method.
- 
+
 And this is where the delegate comes into the scene.
 
 The program flow decides which method will be called during runtime.
