@@ -1,0 +1,203 @@
+To depict an example how delegates are used in event handling, we'll create a Console application, that prints numbers from 0 to 9.
+This app will raise events when counting starts and when it ends.
+
+First thing we'll do is to define 2 delegates, which will handle start and finish events:
+
+[code language=csharp]
+public delegate void CountStartedEventHandler(string _message);
+public delegate void CountFinishedEventHandler(string _message);
+[/code]
+
+The method which will be attached to these events will simply print the message to Console:
+
+[code language=csharp]
+static void sendMessage(string _msg)
+{
+            Console.WriteLine(_msg);
+}
+[/code]
+
+The definition of <em><strong>Counter</strong> </em>class resembles the following code:
+
+[code language=csharp]
+ public class Counter
+        {
+
+            //define events for start and finish
+            //notice, that events return a delegate
+            public event CountStartedEventHandler CountStart;
+            public event CountFinishedEventHandler CountFinished;
+
+            public void Count()
+            {
+                //call function that will handle delegate calls
+                OnCountStart(); 
+
+                for (int a = 0; a < 10; a++)
+                {
+                    Console.WriteLine(a);
+                    System.Threading.Thread.Sleep(500);
+                }
+
+                //call function that will handle delegate calls
+                //and pass the values
+                OnCountFinished();  
+            }
+
+            private void OnCountStart()
+            {
+                //create a delegate
+                CountStartedEventHandler delStart = CountStart;
+
+                if (delStart != null)
+                {
+                    //this is where real event handling action takes place.
+                    //appropriate method arguments are pushed through a delegate to 
+                    //connected methods
+                    //notice that this class knows nothing about this method
+                    //it just pushes the parameter
+                    //all necessary plumbing is connected during runtime.
+                    //And this is good, because it provides encapsulation
+                    //and allows this class to be used in different scenarios,
+                    //without modifying it
+                    delStart("Count Started!");
+
+                    //Our example is very simple and only pushes message to print.
+                    //But if we take for instance - mousemove event:
+                    //The same scenario will take place every time 
+                    //system registers new mouse coordinates and pushes them
+                    //as the event arguments
+                    //to the appropriate method, which will decide what to do next.
+                }
+            }
+
+            private void OnCountFinished()
+            {
+                CountFinishedEventHandler delFinished = CountFinished;
+
+                if (delFinished != null)
+                {
+                    delFinished("Count Finished!");
+                }
+            }
+        }
+[/code]
+
+And one more thing left to do is to initialize <em><strong>Counter</strong> </em>instance and connect <em><strong>sendMessage</strong> </em>method to <em><strong>CountStart</strong> </em>and <em><strong>CountFinished</strong></em> events.
+
+[code language=csharp]
+        static void Main(string[] args)
+        {
+
+            //initialize counter object
+            Counter counter = new Counter();
+
+            //define which methods will handle CountStart and CountFinished events
+            counter.CountStart += sendMessage;
+            counter.CountFinished += sendMessage;
+
+            //start counting
+            counter.Count();
+
+            Console.ReadLine();
+
+        }
+[/code]
+
+The result of running our app will resemble the following screen:
+<img   src="https://mikewaniewski.files.wordpress.com/2015/01/console3.png"   /></a>
+<h3>Using Custom EventArgs to pass event arguments</h3>
+The code presented above is OK, but if we need to pass more arguments than a single message, we'll have to add this functionality.
+And this is a scenario, when <em><strong>CustomEventArgs</strong> </em>should be used, because it allows to pass unlimited amount of arguments.
+
+You probably seen usage of <em><strong>EventArgs </strong></em>many times in event handlers definition:
+For example:
+
+[code language=csharp]
+public void Button_Click(object sender, EventArgs e){}
+[/code]
+
+So let's define our <em><strong>CustomEventArgs</strong> </em>class, which will contain properties representing event generation DateTime and message:
+
+[code language=csharp]
+public class CustomEventArgs : System.EventArgs
+{
+	 public DateTime eventDate { get; set; }
+         public string message { get; set; }
+}
+[/code]
+
+No matter how many properties will be encapsulated into our <em><strong>CustomEventArgs</strong></em>, they will always be passed properly to the destination methods thanks to <em><strong>System.EventArgs</strong></em> class, which is inherited by <em><strong>CustomEventArgs</strong> </em>class.
+
+We'll also need to change <em><strong>sendMessage</strong> </em>method to receive <em><strong>CustomEventArgs</strong> </em>object and to display event time and message:
+
+[code language=csharp]
+static void sendMessage(object sender, CustomEventArgs e)
+{
+      Console.WriteLine(
+          String.Format("eventDate: {0}, message: {1}", e.eventDate, e.message));
+}
+[/code]
+
+And also, inside <em><strong>Counter</strong> </em>class, event raising code must be changed accordingly:
+
+[code language=csharp]
+delStart(this,  new CustomEventArgs(){ 
+         eventDate = System.DateTime.Now, 
+         message= "Count Started!"} 
+);
+[/code]
+
+In this code, we are passing <em><strong>this</strong> </em>- as the reference to the object raising event (this is of course object of type <em><strong>Counter</strong></em>) and creating <em><strong>CustomEventArgs</strong> </em>object where values are assigned inline.
+
+After running the app once again, the result will resemble this screen:
+<img   src="https://mikewaniewski.files.wordpress.com/2015/01/console4.png" />
+
+&nbsp;
+
+&nbsp;
+<h3>EventHandler &lt;T&gt;</h3>
+We can make our code even shorter, taking advantage of .NET Framework generic types.
+Generic types are one of the most powerful features of .NET. They allow to connect types to places defined by placeholder (where T is type name). And these types are not known until runtime.
+
+This delegate and event definition:
+
+[code language=csharp]
+public delegate void CountStartedEventHandler(object sender, CustomEventArgs e);
+public event CountFinishedEventHandler CountFinished;
+[/code]
+
+can be substituted with:
+
+[code language=csharp]
+public event EventHandler<CustomEventArgs> CountFinished;
+[/code]
+
+which is a built-in delegate that generates the delegate behind the scenes.
+
+If you hover over EventHandler definition in VisualStudio - you'll see the following:
+<img   src="https://mikewaniewski.files.wordpress.com/2015/01/vshover.png"   />
+
+This information tells us, that we'll be calling
+
+[code language=csharp]
+delegate System.EventHandler<TEventArgs>
+[/code]
+
+So this delegate awaits for any type derived from <em><strong>EventArgs</strong></em>
+
+Also, when we use this delegate later, the code must be changed from:
+
+[code language=csharp]
+CountFinishedEventHandler delFinished = CountFinished;
+[/code]
+
+to:
+
+[code language=csharp]
+EventHandler<CustomEventArgs> delFinished = CountFinished;
+[/code]
+
+This approach is faster, but requires you to understand what's happening.
+And it's good for events only.
+If you need to use delegate in other scenarios - then you should use the previous approach.
