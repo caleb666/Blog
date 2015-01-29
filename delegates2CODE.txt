@@ -3,6 +3,8 @@ This app will raise events when counting starts and when it ends.
 
 First thing we'll do is to define 2 delegates, which will handle start and finish events:
 
+
+
 [code language=csharp]
 public delegate void CountStartedEventHandler(string _message);
 public delegate void CountFinishedEventHandler(string _message);
