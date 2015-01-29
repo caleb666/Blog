@@ -1,0 +1,31 @@
+I always like to save time by automating tasks, especially if I need to perform these tasks very frequently.
+
+An example of such task is updating my project from the main repository and deploying it to the server.
+
+Normally it takes 10-15 clicks to do, and the same amount of seconds if doing it fast - before the actual deployment starts.
+
+How about changing it all to 1 click.
+
+I did it this way, using VBScript:
+
+[code]
+Option Explicit
+Dim wshShell
+On Error Resume Next
+   Set wshShell = WScript.CreateObject("WSCript.shell")
+   If Err.Number <> 0 Then
+      Wscript.Quit
+   End If
+   wshShell.Run  "cmd.exe /C cd C:\Program Files\TortoiseSVN\bin>TortoiseProc.exe & TortoiseProc.exe /command:update /path:""d:\MY_PROJECT_FOLDER\"" /closeonend:1"
+
+   
+   Set wshShell = WScript.CreateObject("WSCript.shell")
+   If Err.Number <> 0 Then
+      Wscript.Quit
+   End If
+   wshShell.Run  "cmd.exe /C cd C:\Windows\Microsoft.NET\Framework\v4.0.30319  &  msbuild.exe C:\MY_PROJECT_FOLDER\MY_PROJECT.sln /p:DeployOnBuild=true /p:PublishProfile=myPublishProfile"
+On Error Goto 0
+
+[/code]
+
+This script can later be saved as <em><strong>deploymentScript.vbs</strong></em> (Visual Basic Script) and fired anytime from console or shortcut.

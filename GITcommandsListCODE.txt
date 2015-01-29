@@ -1,0 +1,92 @@
+<strong>CONFIG
+</strong><strong>git config --global --list</strong> [show global settings]
+<strong>git config --global user.name "mike"
+</strong><strong><span style="font-size: 18px; line-height: 1.7;">git config --global user.email "me@mymail.com"</span></strong>
+
+&nbsp;
+
+<strong>INIT</strong>
+<strong>git init</strong> [create repository in current location. creates ".git" hidden directory containing all metadata]
+<strong>git log</strong> [show repository log -recent commits with comments, date and amount of files added]
+<strong>git status</strong> [shows files newly created, or updated that has been added (staged) to repo, but not commited yet]
+
+&nbsp;
+
+<strong>PULL FROM remote origin</strong>
+<strong>git remote add origin https://</strong> [add link to pull from another developer]
+<strong>git pull origin master</strong> [download from origin source, master branch]
+<strong>git pull origin v3.0</strong> [download files from origin source, v3.0 branch]
+
+&nbsp;
+
+<strong>INDEXING [staging]</strong>
+<strong>git add -A</strong> [add all new or updated files to repository]
+<strong>git add *.txt</strong> [add .txt files]
+<strong>git add file.txt</strong> [add specific file]
+<strong>git add -u</strong> [adds all updated files]
+
+&nbsp;
+
+<strong>COMMIT</strong>
+<strong>git commit</strong> [commit - editor will be opened to add message]
+<strong>git commit -m "changes info"</strong> [commit with custom message]
+
+&nbsp;
+
+<strong>STASH</strong>
+<strong>git stash</strong> [hide all changes awaiting for staging and reverse changes]
+<strong>git stash apply</strong> [bring hidden changes back] and apply them to files]
+
+&nbsp;
+
+<strong>CHECKOUT [reverting]</strong>
+Checkout acts differently in git if compared to centralized Version Control Systems.
+Git maps repository to a folder.
+When switching between branches - contents of these branches are added or removed to a folder.
+git checkout filename.txt [revert to previous version - if not commited or added to index]
+<strong>git checkout HEAD filename.txt</strong> [revert to previous version - if added to index but not commited]
+<strong>git checkout filename.txt</strong>
+<strong>git checkout origin/master filename.txt</strong> [revert if commited]
+<strong>git reset --hard origin/master</strong> [revert DESTROYING all commits from the branch]
+<strong>git reset --hard</strong> [reset all changes]
+<strong>git reset --hard HEAD~1</strong>
+<strong>git reset --soft HEAD~1</strong>
+
+&nbsp;
+
+<strong>TAGGING</strong>
+<strong>git tag -a v1.0 -m "Version 1"</strong> [apply a tag v1.0 with message]
+<strong>git show v1.0</strong> [show details about tagged version (who tagged, date etc)]
+
+&nbsp;
+
+<strong>BRANCHING</strong>
+<strong>git branch v2.0</strong> [create new branch]
+<strong>git checkout v2.0</strong> [switch to branch v2.0]
+[apply changes]
+<strong>git commit -m "v2.0 changes"</strong>
+<strong>git checkout master</strong> [return to master branch - at this point changes made in branch v2.0 are gone]
+<strong>git checkout v2.0</strong> [switch to branch v2.0 - and again changes are visible]
+<strong>git push origin v2.0</strong> [pushes a branch to remote repo]
+<strong>git branch -r</strong> [list remote branches]
+
+&nbsp;
+
+<strong>MERGING:</strong>
+<em>FastForward</em> - [if no changes happened in MASTER BRANCH: silent merge, where there are no conflicts]
+<em>Merge-commit</em> - [if there are changes - you need to resolve conflicts to merge into MASTER BRANCH ]
+<em>Rebase</em> - [change history to pretend that changes took place in MASTER BRANCH , to reduce unnecessary history info]
+
+<strong>git checkout master</strong> [return to master branch]
+<strong>git merge v2.0</strong> [perform a merge]
+<strong>git log</strong> [shows that changes with message "v2.0 changes" are visible]
+<strong>git mergetool</strong> [opens GUI for merging - depends on what you have installed]
+
+&nbsp;
+
+<strong>WORKING WITH REMOTE SHARED REPOSITORY WITH A TEAM</strong>
+<strong>1)</strong> Make a pull request to download code from shared repository
+<strong>2)</strong> Make local changes, commiting locally (many times)
+<strong>3)</strong> If needed - branch and merge locally
+<strong>4)</strong> Pull again (to resolve conflicts)
+<strong>5)</strong> Push
